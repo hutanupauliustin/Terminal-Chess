@@ -42,7 +42,7 @@ enum chessPieces
 	
 };
 
-enum
+enum piecesColor
 {
 	WHITE = 0,
 	BLACK
@@ -124,7 +124,8 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 		
 		int board[X_SIZE][Y_SIZE];
 		int pieceMoveboard[X_SIZE][Y_SIZE];
-		
+		int isCheckBoad[X_SIZE][Y_SIZE];
+
 		int whoseTurn;
 		renderRow *row;
 		int screenrows;
@@ -270,18 +271,18 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 				if (game.selecty == 0)
 				{
 					game.pieceMoveboard[game.selectx - 1][game.selecty] = pieceColor(game.board[game.selectx - 1][game.selecty]) == WHITE ? 0 : (game.board[game.selectx - 1][game.selecty] == EMPTYSPACE ? 1 : 2);
-					game.pieceMoveboard[game.selectx - 1][game.selecty + 1] = pieceColor(game.board[game.selectx-1][game.selecty+1]) == WHITE ? 0 :(game.board[game.selectx - 1][game.selecty + 1] == EMPTYSPACE ? 1 : 2);
+					game.pieceMoveboard[game.selectx - 1][game.selecty + 1] = pieceColor(game.board[game.selectx-1][game.selecty+1]) == WHITE ? 0 :(game.board[game.selectx - 1][game.selecty + 1] == EMPTYSPACE ? 0 : 2);
 				}
 				else if (game.selecty == 7)
 				{
-					game.pieceMoveboard[game.selectx - 1][game.selecty - 1] = pieceColor(game.board[game.selectx-1][game.selecty-1]) == WHITE ? 0 :(game.board[game.selectx - 1][game.selecty - 1] == EMPTYSPACE ? 1 : 2);
+					game.pieceMoveboard[game.selectx - 1][game.selecty - 1] = pieceColor(game.board[game.selectx-1][game.selecty-1]) == WHITE ? 0 :(game.board[game.selectx - 1][game.selecty - 1] == EMPTYSPACE ? 0 : 2);
 					game.pieceMoveboard[game.selectx - 1][game.selecty] = pieceColor(game.board[game.selectx - 1][game.selecty]) == WHITE ? 0 : (game.board[game.selectx - 1][game.selecty] == EMPTYSPACE ? 1 : 2);
 				}
 				else
 				{
-					game.pieceMoveboard[game.selectx - 1][game.selecty - 1] = pieceColor(game.board[game.selectx-1][game.selecty-1]) == WHITE ? 0 :(game.board[game.selectx - 1][game.selecty - 1] == EMPTYSPACE ? 1 : 2);
+					game.pieceMoveboard[game.selectx - 1][game.selecty - 1] = pieceColor(game.board[game.selectx-1][game.selecty-1]) == WHITE ? 0 :(game.board[game.selectx - 1][game.selecty - 1] == EMPTYSPACE ? 0 : 2);
 					game.pieceMoveboard[game.selectx - 1][game.selecty] = pieceColor(game.board[game.selectx - 1][game.selecty]) == WHITE ? 0 : (game.board[game.selectx - 1][game.selecty] == EMPTYSPACE ? 1 : 2);
-					game.pieceMoveboard[game.selectx - 1][game.selecty + 1] = pieceColor(game.board[game.selectx-1][game.selecty+1]) == WHITE ? 0 :(game.board[game.selectx - 1][game.selecty + 1] == EMPTYSPACE ? 1 : 2);
+					game.pieceMoveboard[game.selectx - 1][game.selecty + 1] = pieceColor(game.board[game.selectx-1][game.selecty+1]) == WHITE ? 0 :(game.board[game.selectx - 1][game.selecty + 1] == EMPTYSPACE ? 0 : 2);
 				}
 				break;
 			}
@@ -290,18 +291,18 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 				if (game.selecty == 0)
 				{
 					game.pieceMoveboard[game.selectx + 1][game.selecty] = pieceColor(game.board[game.selectx + 1][game.selecty]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty] == EMPTYSPACE ? 1 : 2);
-					game.pieceMoveboard[game.selectx + 1][game.selecty + 1] = pieceColor(game.board[game.selectx + 1][game.selecty + 1]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty + 1] == EMPTYSPACE ? 1 : 2);
+					game.pieceMoveboard[game.selectx + 1][game.selecty + 1] = pieceColor(game.board[game.selectx + 1][game.selecty + 1]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty + 1] == EMPTYSPACE ? 0 : 2);
 				}
 				else if (game.selecty == 7)
 				{
-					game.pieceMoveboard[game.selectx + 1][game.selecty - 1] = pieceColor(game.board[game.selectx + 1][game.selecty - 1]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty - 1] == EMPTYSPACE ? 1 : 2);
+					game.pieceMoveboard[game.selectx + 1][game.selecty - 1] = pieceColor(game.board[game.selectx + 1][game.selecty - 1]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty - 1] == EMPTYSPACE ? 0 : 2);
 					game.pieceMoveboard[game.selectx + 1][game.selecty] = pieceColor(game.board[game.selectx + 1][game.selecty]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty] == EMPTYSPACE ? 1 : 2);
 				}
 				else
 				{
-					game.pieceMoveboard[game.selectx + 1][game.selecty - 1] = pieceColor(game.board[game.selectx + 1][game.selecty - 1]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty - 1] == EMPTYSPACE ? 1 : 2);
+					game.pieceMoveboard[game.selectx + 1][game.selecty - 1] = pieceColor(game.board[game.selectx + 1][game.selecty - 1]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty - 1] == EMPTYSPACE ? 0 : 2);
 					game.pieceMoveboard[game.selectx + 1][game.selecty] = pieceColor(game.board[game.selectx + 1][game.selecty]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty] == EMPTYSPACE ? 1 : 2);
-					game.pieceMoveboard[game.selectx + 1][game.selecty + 1] = pieceColor(game.board[game.selectx + 1][game.selecty + 1]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty + 1] == EMPTYSPACE ? 1 : 2);
+					game.pieceMoveboard[game.selectx + 1][game.selecty + 1] = pieceColor(game.board[game.selectx + 1][game.selecty + 1]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty + 1] == EMPTYSPACE ? 0 : 2);
 				}
 				break;
 			}
@@ -964,6 +965,23 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 		return 0;
 	}
 	
+	int movePiece(){
+
+		if(game.pieceMoveboard[game.cursorx][game.cursory] == 1){ //can the piece move there?
+			game.board[game.cursorx][game.cursory] = game.board[game.selectx][game.selecty];
+			game.board[game.selectx][game.selecty] = EMPTYSPACE;
+			deselectPiece();
+			return 1;
+		}
+
+		if (game.pieceMoveboard[game.cursorx][game.cursory] == 2){ // can the piece take what's there?
+			game.board[game.cursorx][game.cursory] = game.board[game.selectx][game.selecty];
+			game.board[game.selectx][game.selecty] = EMPTYSPACE;
+			deselectPiece();
+			return 1;
+		}
+		return 0;
+	}
 	/*** input ***/
 	
 	int outOfBounds(int x, int y){
@@ -1092,7 +1110,15 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 			break;
 			
 			case ' ':
-			selectPiece();
+			if(pieceColor(game.board[game.cursorx][game.cursory]) == game.whoseTurn)
+				selectPiece();
+			break;
+
+			case '\r':
+			if(game.selectx != -1){
+				if(movePiece())
+					game.whoseTurn = !game.whoseTurn;
+			}
 			break;
 			
 			case '\x1b':
@@ -1300,6 +1326,11 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 	
 	/***init ***/
 	
+void initIsCheckBoard(){
+
+
+}
+
 	void initGameTheme(){
 		
 		game.theme.darkAvailableSquare = RGBtoColor(22, 115, 108);
@@ -1316,35 +1347,35 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 	}
 	
 	void initGame(){
-		
+
 		int startState[8][8] = {
 			{BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK},
-			{BLACK_PAWN, BLACK_PAWN, WHITE_KING, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN},
-			
-			{EMPTYSPACE, WHITE_KNIGHT, BLACK_PAWN, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE},
-			{EMPTYSPACE, BLACK_PAWN, BLACK_PAWN, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE},
-			{EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, WHITE_KING, EMPTYSPACE, BLACK_KING, EMPTYSPACE},
-			{EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, BLACK_KNIGHT, EMPTYSPACE, EMPTYSPACE},
-			
+			{BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN},
+
+			{EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE},
+			{EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE},
+			{EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE},
+			{EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE},
+
 			{WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN},
 			{WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK}};
-			
-			memcpy(game.board, startState, sizeof(game.board));
-			
-			if (getWindowSize(&game.screenrows, &game.screencols) == -1)
+
+		memcpy(game.board, startState, sizeof(game.board));
+
+		if (getWindowSize(&game.screenrows, &game.screencols) == -1)
 			die("getWindowSize");
 			
-			game.screenrows -= 2;
+		game.screenrows -= 2;
 			
-			game.cursorx = 0;
-			game.cursory = 0;
+		game.cursorx = 0;
+		game.cursory = 0;
 			
-			game.selectx = -1;
-			game.selecty = -1;
+		game.selectx = -1;
+		game.selecty = -1;
 			
-			game.whoseTurn = WHITE;
+		game.whoseTurn = WHITE;
 			
-			initGameTheme();
+		initGameTheme();
 		}
 		
 		int main(){
