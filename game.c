@@ -20,257 +20,389 @@
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 
-enum chessPieces
-{
-	WHITE_PAWN = 0,
-	WHITE_KNIGHT,
-	WHITE_BISHOP,
-	WHITE_ROOK,
-	WHITE_QUEEN,
-	WHITE_KING,
-	EMPTYSPACE,
-	CURSOR,
-	BLACK_PAWN,
-	BLACK_KNIGHT,
-	BLACK_BISHOP,
-	BLACK_ROOK,
-	BLACK_QUEEN,
-	BLACK_KING
+/***prototypes ***/
+int outOfBounds(int x, int y);
 
-};
-
-enum
-{
-	WHITE = 0,
-	BLACK
-};
-
-int pieceColor(int piece){
-
-	if(piece >= WHITE_PAWN && piece <= WHITE_KING)
-		return WHITE;
-	
-	if(piece >= BLACK_PAWN && piece <= BLACK_KING)
-		return BLACK;
-
-	return -1;
-}
-
-char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\033[30m",
-					"\033[37m♜\033[30m", "\033[37m♛\033[30m", "\033[37m♚\033[30m",
-					" \033[30m", "",
-					"\033[30m♟\033[30m", "\033[30m♞\033[30m", "\033[30m♝\033[30m",
-					"\033[30m♜\033[30m", "\033[30m♛\033[30m", "\033[30m♚\033[30m"};
-
-enum inputKey
-{
-
-	BACKSPACE = 127,
-	ARROW_LEFT = 1000,
-	ARROW_RIGHT,
-	ARROW_UP,
-	ARROW_DOWN,
-	DEL_KEY,
-	HOME_KEY,
-	END_KEY,
-	PAGE_UP,
-	PAGE_DOWN
-
-};
-
-/*** data ***/
-
-typedef struct color{
-	int r;
-	int g;
-	int b;
-} color;
-
-color RGBtoColor(int r, int g, int b){
-	color buff;
-	buff.r = r;
-	buff.g = g;
-	buff.b = b;
-
-	return buff;
-}
-
-typedef struct configColors{
-	color darkSquare;
-	color lightSquare;
-	color darkSelectedSquare;
-	color lightSelectedSquare;
-	color darkAvailableSquare;
-	color lightAvailableSquare;
-	color darkTakeablePieceSquare;
-	color lightTakeablePieceSquare;
-
-} configColors;
-
-typedef struct renderRow{
-	char *chars;
-}renderRow;
-
-typedef struct config{
-
-	int board[X_SIZE][Y_SIZE];
-	int pieceMoveboard [X_SIZE][Y_SIZE];
-	
-	int whoseTurn;
-	renderRow *row;
-	int screenrows;
-	int screencols;
-	int cursorx;
-	int cursory;
-	int selectx;
-	int selecty;
-	configColors theme;
-
-	struct termios orig_termios;
-}config;
-
-config game;
-
-/*** terminal ***/
-
-void die(const char *s)
-{
-	write(STDOUT_FILENO, "\x1b[2J", 4);
-	write(STDOUT_FILENO, "\x1b[H", 3);
-	write(STDOUT_FILENO, "\x1b[?25h", 6);
-
-	perror(s);
-	exit(1);
-}
-
-void disableRawMode()
-{
-
-	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &game.orig_termios) == -1)
-		die("tcsetattr");
-}
-
-void enableRawMode()
-{
-	if (tcgetattr(STDIN_FILENO, &game.orig_termios) == -1)
-		die("tcgetattr");
-	atexit(disableRawMode);
-
-	struct termios raw = game.orig_termios;
-
-	raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-	raw.c_oflag &= ~(OPOST);
-	raw.c_cflag |= (CS8);
-	raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
-	raw.c_cc[VMIN] = 0;
-	raw.c_cc[VTIME] = 1;
-
-	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1)
-		die("tcsetattr");
-}
-
-int getCursorPosition(int *rows, int *cols)
-{
-	char buf[32];
-	unsigned int i = 0;
-
-	if (write(STDOUT_FILENO, "\x1b[6n", 4) != 4)
-		return -1;
-
-	while (i < sizeof(buf) - 1)
+	enum chessPieces
 	{
-		if (read(STDIN_FILENO, &buf[i], 1) != 1)
-			break;
-		if (buf[i] == 'R')
-			break;
-		i++;
+		WHITE_PAWN = 0,
+		WHITE_KNIGHT,
+		WHITE_BISHOP,
+		WHITE_ROOK,
+		WHITE_QUEEN,
+		WHITE_KING,
+		EMPTYSPACE,
+		CURSOR,
+		BLACK_PAWN,
+		BLACK_KNIGHT,
+		BLACK_BISHOP,
+		BLACK_ROOK,
+		BLACK_QUEEN,
+		BLACK_KING
+
+	};
+
+	enum
+	{
+		WHITE = 0,
+		BLACK
+	};
+
+	int pieceColor(int piece)
+	{
+
+		if (piece >= WHITE_PAWN && piece <= WHITE_KING)
+			return WHITE;
+
+		if (piece >= BLACK_PAWN && piece <= BLACK_KING)
+			return BLACK;
+
+		return -1;
 	}
 
-	buf[i] = '\0';
-	if (buf[0] != '\x1b' || buf[1] != '[')
-		return -1;
-	if (sscanf(&buf[2], "%d;%d", rows, cols) != 2)
-		return -1;
+	char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\033[30m",
+						"\033[37m♜\033[30m", "\033[37m♛\033[30m", "\033[37m♚\033[30m",
+						" \033[30m", "",
+						"\033[30m♟\033[30m", "\033[30m♞\033[30m", "\033[30m♝\033[30m",
+						"\033[30m♜\033[30m", "\033[30m♛\033[30m", "\033[30m♚\033[30m"};
 
-	return 0;
-}
-
-int getWindowSize(int *rows, int *cols)
-{
-	struct winsize ws;
-
-	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0)
+	enum inputKey
 	{
-		if (write(STDOUT_FILENO, "\x1b[999C\x1b[999B", 12) != 12)
+
+		BACKSPACE = 127,
+		ARROW_LEFT = 1000,
+		ARROW_RIGHT,
+		ARROW_UP,
+		ARROW_DOWN,
+		DEL_KEY,
+		HOME_KEY,
+		END_KEY,
+		PAGE_UP,
+		PAGE_DOWN
+
+	};
+
+	/*** data ***/
+
+	typedef struct color
+	{
+		int r;
+		int g;
+		int b;
+	} color;
+
+	color RGBtoColor(int r, int g, int b)
+	{
+		color buff;
+		buff.r = r;
+		buff.g = g;
+		buff.b = b;
+
+		return buff;
+	}
+
+	typedef struct configColors
+	{
+		color darkSquare;
+		color lightSquare;
+		color darkSelectedSquare;
+		color lightSelectedSquare;
+		color darkAvailableSquare;
+		color lightAvailableSquare;
+		color darkTakeablePieceSquare;
+		color lightTakeablePieceSquare;
+
+	} configColors;
+
+	typedef struct renderRow
+	{
+		char *chars;
+	} renderRow;
+
+	typedef struct config
+	{
+
+		int board[X_SIZE][Y_SIZE];
+		int pieceMoveboard[X_SIZE][Y_SIZE];
+
+		int whoseTurn;
+		renderRow *row;
+		int screenrows;
+		int screencols;
+		int cursorx;
+		int cursory;
+		int selectx;
+		int selecty;
+		configColors theme;
+
+		struct termios orig_termios;
+	} config;
+
+	config game;
+
+	/*** terminal ***/
+
+	void die(const char *s)
+	{
+		write(STDOUT_FILENO, "\x1b[2J", 4);
+		write(STDOUT_FILENO, "\x1b[H", 3);
+		write(STDOUT_FILENO, "\x1b[?25h", 6);
+
+		perror(s);
+		exit(1);
+	}
+
+	void disableRawMode()
+	{
+		write(STDOUT_FILENO, "\033[?1049l", 9);
+
+		if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &game.orig_termios) == -1)
+			die("tcsetattr");
+	}
+
+	void enableRawMode()
+	{
+		if (tcgetattr(STDIN_FILENO, &game.orig_termios) == -1)
+			die("tcgetattr");
+		atexit(disableRawMode);
+
+		struct termios raw = game.orig_termios;
+
+		raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+		raw.c_oflag &= ~(OPOST);
+		raw.c_cflag |= (CS8);
+		raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+		raw.c_cc[VMIN] = 0;
+		raw.c_cc[VTIME] = 1;
+
+		if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1)
+			die("tcsetattr");
+
+		write(STDOUT_FILENO, "\033[?1049h", 9);
+	}
+
+	int getCursorPosition(int *rows, int *cols)
+	{
+		char buf[32];
+		unsigned int i = 0;
+
+		if (write(STDOUT_FILENO, "\x1b[6n", 4) != 4)
 			return -1;
-		return getCursorPosition(rows, cols);
-	}
-	else
-	{
-		*cols = ws.ws_col;
-		*rows = ws.ws_row;
+
+		while (i < sizeof(buf) - 1)
+		{
+			if (read(STDIN_FILENO, &buf[i], 1) != 1)
+				break;
+			if (buf[i] == 'R')
+				break;
+			i++;
+		}
+
+		buf[i] = '\0';
+		if (buf[0] != '\x1b' || buf[1] != '[')
+			return -1;
+		if (sscanf(&buf[2], "%d;%d", rows, cols) != 2)
+			return -1;
+
 		return 0;
 	}
-}
 
-/***game ***/
+	int getWindowSize(int *rows, int *cols)
+	{
+		struct winsize ws;
+
+		if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0)
+		{
+			if (write(STDOUT_FILENO, "\x1b[999C\x1b[999B", 12) != 12)
+				return -1;
+			return getCursorPosition(rows, cols);
+		}
+		else
+		{
+			*cols = ws.ws_col;
+			*rows = ws.ws_row;
+			return 0;
+		}
+	}
+
+	/***game ***/
 
 void LoadselectedPieceboard()
-{
-	for (int i = 0; i < X_SIZE; i++)
-		for (int j = 0; j < Y_SIZE; j++)
-			game.pieceMoveboard[i][j] = 0;
-
-	if (game.selectx == -1 || game.selecty == -1)
-		return;
-
-	switch (game.board[game.selectx][game.selecty])
 	{
+		for (int i = 0; i < X_SIZE; i++)
+			for (int j = 0; j < Y_SIZE; j++)
+				game.pieceMoveboard[i][j] = 0;
 
-	case WHITE_PAWN:
-		if (game.selecty == 0)
-		{
-			game.pieceMoveboard[game.selectx - 1][game.selecty] = (game.board[game.selectx - 1][game.selecty] == EMPTYSPACE ? 1 : 2);
-			game.pieceMoveboard[game.selectx - 1][game.selecty + 1] = (game.board[game.selectx - 1][game.selecty + 1] == EMPTYSPACE ? 1 : 2);
-		}
-		else if (game.selecty == 7)
-		{
-			game.pieceMoveboard[game.selectx - 1][game.selecty - 1] = (game.board[game.selectx - 1][game.selecty - 1] == EMPTYSPACE ? 1 : 2);
-			game.pieceMoveboard[game.selectx - 1][game.selecty] = (game.board[game.selectx - 1][game.selecty] == EMPTYSPACE ? 1 : 2);
-		}
-		else
-		{
-			game.pieceMoveboard[game.selectx - 1][game.selecty - 1] = (game.board[game.selectx - 1][game.selecty - 1] == EMPTYSPACE ? 1 : 2);
-			game.pieceMoveboard[game.selectx - 1][game.selecty] = (game.board[game.selectx - 1][game.selecty] == EMPTYSPACE ? 1 : 2);
-			game.pieceMoveboard[game.selectx - 1][game.selecty + 1] = (game.board[game.selectx - 1][game.selecty + 1] == EMPTYSPACE ? 1 : 2);
-		}
-		break;
-	case BLACK_PAWN:
-		if (game.selecty == 0)
-		{
-			game.pieceMoveboard[game.selectx + 1][game.selecty] = (game.board[game.selectx + 1][game.selecty] == EMPTYSPACE ? 1 : 2);
-			game.pieceMoveboard[game.selectx + 1][game.selecty + 1] = (game.board[game.selectx + 1][game.selecty + 1] == EMPTYSPACE ? 1 : 2);
-		}
-		else if (game.selecty == 7)
-		{
-			game.pieceMoveboard[game.selectx + 1][game.selecty - 1] = (game.board[game.selectx + 1][game.selecty + 1] == EMPTYSPACE ? 1 : 2);
-			game.pieceMoveboard[game.selectx + 1][game.selecty] = (game.board[game.selectx + 1][game.selecty] == EMPTYSPACE ? 1 : 2);
-		}
-		else
-		{
-			game.pieceMoveboard[game.selectx + 1][game.selecty - 1] = (game.board[game.selectx + 1][game.selecty - 1] == EMPTYSPACE ? 1 : 2);
-			game.pieceMoveboard[game.selectx + 1][game.selecty] = (game.board[game.selectx + 1][game.selecty] == EMPTYSPACE ? 1 : 2);
-			game.pieceMoveboard[game.selectx + 1][game.selecty + 1] = (game.board[game.selectx + 1][game.selecty + 1] == EMPTYSPACE ? 1 : 2);
-		}
-		break;
+		if (game.selectx == -1 || game.selecty == -1)
+			return;
 
-		/*case WHITE_ROOK:
+		switch (game.board[game.selectx][game.selecty])
+		{
+
+		case WHITE_PAWN:
+		{
+			if (game.selecty == 0)
+			{
+				game.pieceMoveboard[game.selectx - 1][game.selecty] = (game.board[game.selectx - 1][game.selecty] == EMPTYSPACE ? 1 : 2);
+				game.pieceMoveboard[game.selectx - 1][game.selecty + 1] = (game.board[game.selectx - 1][game.selecty + 1] == EMPTYSPACE ? 1 : 2);
+			}
+			else if (game.selecty == 7)
+			{
+				game.pieceMoveboard[game.selectx - 1][game.selecty - 1] = (game.board[game.selectx - 1][game.selecty - 1] == EMPTYSPACE ? 1 : 2);
+				game.pieceMoveboard[game.selectx - 1][game.selecty] = (game.board[game.selectx - 1][game.selecty] == EMPTYSPACE ? 1 : 2);
+			}
+			else
+			{
+				game.pieceMoveboard[game.selectx - 1][game.selecty - 1] = (game.board[game.selectx - 1][game.selecty - 1] == EMPTYSPACE ? 1 : 2);
+				game.pieceMoveboard[game.selectx - 1][game.selecty] = (game.board[game.selectx - 1][game.selecty] == EMPTYSPACE ? 1 : 2);
+				game.pieceMoveboard[game.selectx - 1][game.selecty + 1] = (game.board[game.selectx - 1][game.selecty + 1] == EMPTYSPACE ? 1 : 2);
+			}
+			break;
+		}
+		case BLACK_PAWN:
+		{
+			if (game.selecty == 0)
+			{
+				game.pieceMoveboard[game.selectx + 1][game.selecty] = (game.board[game.selectx + 1][game.selecty] == EMPTYSPACE ? 1 : 2);
+				game.pieceMoveboard[game.selectx + 1][game.selecty + 1] = (game.board[game.selectx + 1][game.selecty + 1] == EMPTYSPACE ? 1 : 2);
+			}
+			else if (game.selecty == 7)
+			{
+				game.pieceMoveboard[game.selectx + 1][game.selecty - 1] = (game.board[game.selectx + 1][game.selecty + 1] == EMPTYSPACE ? 1 : 2);
+				game.pieceMoveboard[game.selectx + 1][game.selecty] = (game.board[game.selectx + 1][game.selecty] == EMPTYSPACE ? 1 : 2);
+			}
+			else
+			{
+				game.pieceMoveboard[game.selectx + 1][game.selecty - 1] = (game.board[game.selectx + 1][game.selecty - 1] == EMPTYSPACE ? 1 : 2);
+				game.pieceMoveboard[game.selectx + 1][game.selecty] = (game.board[game.selectx + 1][game.selecty] == EMPTYSPACE ? 1 : 2);
+				game.pieceMoveboard[game.selectx + 1][game.selecty + 1] = (game.board[game.selectx + 1][game.selecty + 1] == EMPTYSPACE ? 1 : 2);
+			}
+			break;
+		}
+		case WHITE_ROOK:
+		{
 			for(int i = game.selectx; ;i++){
 				if(outOfBounds(i,game.selecty))
 					break;
-				if(game.)
+				else if(pieceColor(game.board[i][game.selecty]) == BLACK ){
+					game.pieceMoveboard[i][game.selecty] = 2;
+					break;
+				}
+				else if (pieceColor(game.board[i][game.selecty]) == WHITE && i != game.selectx)
+					break;
+				else
+					game.pieceMoveboard[i][game.selecty] = 1;
 			}
-		case BLACK_ROOK:*/
+
+			for (int i = game.selectx;; i--)
+			{
+				if (outOfBounds(i, game.selecty))
+					break;
+				else if (pieceColor(game.board[i][game.selecty]) == BLACK)
+				{
+					game.pieceMoveboard[i][game.selecty] = 2;
+					break;
+				}
+				else if (pieceColor(game.board[i][game.selecty]) == WHITE && i != game.selectx)
+					break;
+				else
+					game.pieceMoveboard[i][game.selecty] = 1;
+			}
+
+			for (int j = game.selecty;; j--)
+			{
+				if (outOfBounds(j, game.selecty))
+					break;
+				else if (pieceColor(game.board[game.selectx][j]) == BLACK)
+				{
+					game.pieceMoveboard[game.selectx][j] = 2;
+					break;
+				}
+				else if (pieceColor(game.board[game.selectx][j]) == WHITE && j != game.selecty)
+					break;
+				else
+					game.pieceMoveboard[game.selectx][j] = 1;
+			}
+
+			for (int j = game.selecty;; j++)
+			{
+				if (outOfBounds(j, game.selecty))
+					break;
+				else if (pieceColor(game.board[game.selectx][j]) == BLACK)
+				{
+					game.pieceMoveboard[game.selectx][j] = 2;
+					break;
+				}
+				else if (pieceColor(game.board[game.selectx][j]) == WHITE && j != game.selecty)
+					break;
+				else 
+					game.pieceMoveboard[game.selectx][j] = 1;
+			}
+			break;
+	}
+		case BLACK_ROOK:
+		{
+			for (int i = game.selectx;; i++)
+			{
+				if (outOfBounds(i, game.selecty))
+					break;
+				else if (pieceColor(game.board[i][game.selecty]) == WHITE)
+				{
+					game.pieceMoveboard[i][game.selecty] = 2;
+					break;
+				}
+				else if (pieceColor(game.board[i][game.selecty]) == BLACK && i != game.selectx)
+					break;
+				else
+					game.pieceMoveboard[i][game.selecty] = 1;
+			}
+
+			for (int i = game.selectx;; i--)
+			{
+				if (outOfBounds(i, game.selecty))
+					break;
+				else if (pieceColor(game.board[i][game.selecty]) == WHITE)
+				{
+					game.pieceMoveboard[i][game.selecty] = 2;
+					break;
+				}
+				else if (pieceColor(game.board[i][game.selecty]) == BLACK && i != game.selectx)
+					break;
+				else
+					game.pieceMoveboard[i][game.selecty] = 1;
+			}
+
+			for (int j = game.selecty;; j--)
+			{
+				if (outOfBounds(j, game.selecty))
+					break;
+				else if (pieceColor(game.board[game.selectx][j]) == WHITE)
+				{
+					game.pieceMoveboard[game.selectx][j] = 2;
+					break;
+				}
+				else if (pieceColor(game.board[game.selectx][j]) == BLACK && j != game.selecty)
+					break;
+				else
+					game.pieceMoveboard[game.selectx][j] = 1;
+			}
+
+			for (int j = game.selecty;; j++)
+			{
+				if (outOfBounds(j, game.selecty))
+					break;
+				else if (pieceColor(game.board[game.selectx][j]) == WHITE)
+				{
+					game.pieceMoveboard[game.selectx][j] = 2;
+					break;
+				}
+				else if (pieceColor(game.board[game.selectx][j]) == BLACK && j != game.selecty)
+					break;
+				else
+					game.pieceMoveboard[game.selectx][j] = 1;
+			}
+			break;
+		}
 	}
 }
 
@@ -520,7 +652,7 @@ void buffAppendColor(struct buff *ab,int ground ,color input)
 	buffAppend(ab, buffer, len);
 }
 
-void drawboard(struct buff *ab)
+void drawBoard(struct buff *ab)
 {
 	char leftBorder[80];
 	int leftBorderLen = (game.screencols - 30)/2;
@@ -628,7 +760,7 @@ void refreshGameWindow(){
 	buffAppend(&ab, "\x1b[?25l",6);
 
 	drawTitle(&ab);
-	drawboard(&ab);
+	drawBoard(&ab);
 
 	write(STDOUT_FILENO, ab.b, ab.len);
 	buffFree(&ab);
@@ -658,9 +790,9 @@ void initGame(){
 		{BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN},
 
 		{WHITE_PAWN, EMPTYSPACE, WHITE_PAWN, EMPTYSPACE, EMPTYSPACE, WHITE_PAWN, EMPTYSPACE, WHITE_PAWN},
+		{EMPTYSPACE, WHITE_PAWN, BLACK_ROOK, WHITE_PAWN, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE},
 		{EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE},
-		{EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE},
-		{BLACK_PAWN, BLACK_PAWN, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, BLACK_PAWN, EMPTYSPACE, BLACK_PAWN},
+		{BLACK_PAWN, BLACK_PAWN, WHITE_PAWN, EMPTYSPACE, EMPTYSPACE, BLACK_PAWN, EMPTYSPACE, BLACK_PAWN},
 
 		{WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN},
 		{WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK}};

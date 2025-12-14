@@ -3,4 +3,4 @@ game: game.c
 clean: 
 		-rm game
 run:
-		./game
+		@./game
