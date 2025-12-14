@@ -279,6 +279,137 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 				}
 				break;
 			}
+			//case WHITE_KNIGHT:
+			//case BLACK_KNIGHT:
+			case WHITE_BISHOP:
+			{
+				int i, j;
+				for (i = game.selectx, j = game.selecty;; i--, j++)
+				{
+					if (outOfBounds(i, j))
+						break;
+					else if (pieceColor(game.board[i][j]) == BLACK)
+					{
+						game.pieceMoveboard[i][j] = 2;
+						break;
+					}
+					else if (pieceColor(game.board[i][j]) == WHITE && i != game.selectx && j != game.selecty)
+						break;
+					else
+						game.pieceMoveboard[i][j] = 1;
+				}
+
+				for (i = game.selectx, j = game.selecty;; i--, j--)
+				{
+					if (outOfBounds(i, j))
+						break;
+					else if (pieceColor(game.board[i][j]) == BLACK)
+					{
+						game.pieceMoveboard[i][j] = 2;
+						break;
+					}
+					else if (pieceColor(game.board[i][j]) == WHITE && i != game.selectx && j != game.selecty)
+						break;
+					else
+						game.pieceMoveboard[i][j] = 1;
+				}
+
+				for (i = game.selectx, j = game.selecty;; i++, j--)
+				{
+					if (outOfBounds(j, j))
+						break;
+					else if (pieceColor(game.board[i][j]) == BLACK)
+					{
+						game.pieceMoveboard[i][j] = 2;
+						break;
+					}
+					else if (pieceColor(game.board[i][j]) == WHITE && i != game.selectx && j != game.selecty)
+						break;
+					else
+						game.pieceMoveboard[i][j] = 1;
+				}
+
+				for (i = game.selectx, j = game.selecty;; i++, j++)
+				{
+					if (outOfBounds(j, j))
+						break;
+					else if (pieceColor(game.board[i][j]) == BLACK)
+					{
+						game.pieceMoveboard[i][j] = 2;
+						break;
+					}
+					else if (pieceColor(game.board[i][j]) == WHITE && i != game.selectx && j != game.selecty)
+						break;
+					else
+						game.pieceMoveboard[i][j] = 1;
+				}
+				break;
+			}
+			case BLACK_BISHOP:
+			{
+				int i, j;
+				for (i = game.selectx, j = game.selecty;; i--, j++)
+				{
+					if (outOfBounds(i, j))
+						break;
+					else if (pieceColor(game.board[i][j]) == WHITE)
+					{
+						game.pieceMoveboard[i][j] = 2;
+						break;
+					}
+					else if (pieceColor(game.board[i][j]) == BLACK && i != game.selectx && j != game.selecty)
+						break;
+					else
+						game.pieceMoveboard[i][j] = 1;
+				}
+
+				for (i = game.selectx, j = game.selecty;; i--, j--)
+				{
+					if (outOfBounds(i, j))
+						break;
+					else if (pieceColor(game.board[i][j]) == WHITE)
+					{
+						game.pieceMoveboard[i][j] = 2;
+						break;
+					}
+					else if (pieceColor(game.board[i][j]) == BLACK && i != game.selectx && j != game.selecty)
+						break;
+					else
+						game.pieceMoveboard[i][j] = 1;
+				}
+
+				for (i = game.selectx, j = game.selecty;; i++, j--)
+				{
+					if (outOfBounds(j, j))
+						break;
+					else if (pieceColor(game.board[i][j]) == WHITE)
+					{
+						game.pieceMoveboard[i][j] = 2;
+						break;
+					}
+					else if (pieceColor(game.board[i][j]) == BLACK && i != game.selectx && j != game.selecty)
+						break;
+					else
+						game.pieceMoveboard[i][j] = 1;
+				}
+
+				for (i = game.selectx, j = game.selecty;; i++, j++)
+
+				{
+					if (outOfBounds(j, j))
+						break;
+					else if (pieceColor(game.board[i][j]) == WHITE)
+					{
+						game.pieceMoveboard[i][j] = 2;
+						break;
+					}
+					else if (pieceColor(game.board[i][j]) == BLACK && i != game.selectx && j != game.selecty)
+						break;
+					else
+						game.pieceMoveboard[i][j] = 1;
+				}
+				break;
+			}
 			case WHITE_ROOK:
 			{
 				for(int i = game.selectx; ;i++){
@@ -400,135 +531,6 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 					break;
 					else
 					game.pieceMoveboard[game.selectx][j] = 1;
-				}
-				break;
-			}
-			case WHITE_BISHOP:
-			{
-				int i,j;
-				for (i = game.selectx,j = game.selecty; ; i--,j++)
-				{
-					if (outOfBounds(i, j))
-					break;
-					else if (pieceColor(game.board[i][j]) == BLACK)
-					{
-						game.pieceMoveboard[i][j] = 2;
-						break;
-					}
-					else if (pieceColor(game.board[i][j]) == WHITE && i != game.selectx && j != game.selecty)
-					break;
-					else
-					game.pieceMoveboard[i][j] = 1;
-				}
-				
-				for (i = game.selectx, j = game.selecty;; i--, j--)
-				{
-					if (outOfBounds(i, j))
-					break;
-					else if (pieceColor(game.board[i][j]) == BLACK)
-					{
-						game.pieceMoveboard[i][j] = 2;
-						break;
-					}
-					else if (pieceColor(game.board[i][j]) == WHITE && i != game.selectx && j != game.selecty)
-					break;
-					else
-					game.pieceMoveboard[i][j] = 1;
-				}
-				
-				for (i = game.selectx, j = game.selecty;; i++, j--)
-				{
-					if (outOfBounds(j, j))
-					break;
-					else if (pieceColor(game.board[i][j]) == BLACK)
-					{
-						game.pieceMoveboard[i][j] = 2;
-						break;
-					}
-					else if (pieceColor(game.board[i][j]) == WHITE && i != game.selectx && j != game.selecty)
-					break;
-					else
-					game.pieceMoveboard[i][j] = 1;
-				}
-				
-				for (i = game.selectx, j = game.selecty;; i++, j++)
-				{
-					if (outOfBounds(j, j))
-					break;
-					else if (pieceColor(game.board[i][j]) == BLACK)
-					{
-						game.pieceMoveboard[i][j] = 2;
-						break;
-					}
-					else if (pieceColor(game.board[i][j]) == WHITE && i != game.selectx && j != game.selecty)
-					break;
-					else
-					game.pieceMoveboard[i][j] = 1;
-				}
-				break;
-			}
-			case BLACK_BISHOP:
-			{
-				int i, j;
-				for (i = game.selectx, j = game.selecty;; i--, j++)
-				{
-					if (outOfBounds(i, j))
-					break;
-					else if (pieceColor(game.board[i][j]) == WHITE)
-					{
-						game.pieceMoveboard[i][j] = 2;
-						break;
-					}
-					else if (pieceColor(game.board[i][j]) == BLACK && i != game.selectx && j != game.selecty)
-					break;
-					else
-					game.pieceMoveboard[i][j] = 1;
-				}
-				
-				for (i = game.selectx, j = game.selecty;; i--, j--)
-				{
-					if (outOfBounds(i, j))
-					break;
-					else if (pieceColor(game.board[i][j]) == WHITE)
-					{
-						game.pieceMoveboard[i][j] = 2;
-						break;
-					}
-					else if (pieceColor(game.board[i][j]) == BLACK && i != game.selectx && j != game.selecty)
-					break;
-					else
-					game.pieceMoveboard[i][j] = 1;
-				}
-				
-				for (i = game.selectx, j = game.selecty;; i++, j--)
-				{
-					if (outOfBounds(j, j))
-					break;
-					else if (pieceColor(game.board[i][j]) == WHITE)
-					{
-						game.pieceMoveboard[i][j] = 2;
-						break;
-					}
-					else if (pieceColor(game.board[i][j]) == BLACK && i != game.selectx && j != game.selecty)
-					break;
-					else
-					game.pieceMoveboard[i][j] = 1;
-				}
-				
-				for (i = game.selectx, j = game.selecty;; i++, j++)
-				
-				{
-					if (outOfBounds(j, j))
-					break;
-					else if (pieceColor(game.board[i][j]) == WHITE)
-					{
-						game.pieceMoveboard[i][j] = 2;
-						break;
-					}
-					else if (pieceColor(game.board[i][j]) == BLACK && i != game.selectx && j != game.selecty)
-					break;
-					else
-					game.pieceMoveboard[i][j] = 1;
 				}
 				break;
 			}
@@ -780,6 +782,9 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 				}
 				break;
 			}
+			//case WHITE_KING:
+			//case BLACK_KING:
+			
 		}
 	}
 	
@@ -1161,34 +1166,35 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 	}
 	
 	void initGame(){
-		
+
 		int startState[8][8] = {
 			{BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK},
 			{BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN},
-			
-			{WHITE_PAWN, EMPTYSPACE, WHITE_PAWN, EMPTYSPACE, EMPTYSPACE, WHITE_QUEEN, EMPTYSPACE, WHITE_PAWN},
-			{EMPTYSPACE, WHITE_PAWN, BLACK_ROOK, WHITE_PAWN, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE},
+
 			{EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE},
-			{BLACK_PAWN, BLACK_PAWN, WHITE_PAWN, EMPTYSPACE, BLACK_QUEEN, BLACK_PAWN, EMPTYSPACE, BLACK_PAWN},
-			
+			{EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE},
+			{EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE},
+			{EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE},
+
 			{WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN},
 			{WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK}};
-			
-			memcpy(game.board, startState, sizeof(game.board));
-			
-			if (getWindowSize (&game.screenrows, &game.screencols) == -1)
+
+		memcpy(game.board, startState, sizeof(game.board));
+
+		if (getWindowSize(&game.screenrows, &game.screencols) == -1)
 			die("getWindowSize");
-			game.screenrows -= 2;
+		
+		game.screenrows -= 2;
 			
-			game.cursorx = 0;
-			game.cursory = 0;
+		game.cursorx = 0;
+		game.cursory = 0;
 			
-			game.selectx = -1;
-			game.selecty = -1;
+		game.selectx = -1;
+		game.selecty = -1;
 			
-			game.whoseTurn = WHITE;
+		game.whoseTurn = WHITE;
 			
-			initGameTheme();
+		initGameTheme();
 		}
 		
 		int main(){
