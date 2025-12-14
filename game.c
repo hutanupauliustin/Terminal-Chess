@@ -254,7 +254,7 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 		return 0;
 	}
 	
-	void LoadselectedPieceBoard()
+	void LoadselectedPieceMoveBoard()
 	{
 		for (int i = 0; i < X_SIZE; i++)
 		for (int j = 0; j < Y_SIZE; j++)
@@ -265,7 +265,10 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 		
 		switch (game.board[game.selectx][game.selecty])
 		{
-			
+			case EMPTYSPACE:
+			{
+				break;
+			}
 			case WHITE_PAWN:
 			{
 				if (game.selecty == 0)
@@ -949,22 +952,13 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 	
 	int selectPiece()
 	{
-		if (game.cursorx == game.selectx && game.selecty == game.cursory)
-		{
-			deselectPiece();
-			LoadselectedPieceBoard();
-			return 1;
-		}
-		if (game.board[game.cursorx][game.cursory] != EMPTYSPACE)
-		{
 			game.selectx = game.cursorx;
 			game.selecty = game.cursory;
-			LoadselectedPieceBoard();
+			LoadselectedPieceMoveBoard();
 			return 1;
-		}
-		return 0;
 	}
-	
+
+
 	int movePiece(){
 
 		if(game.pieceMoveboard[game.cursorx][game.cursory] == 1){ //can the piece move there?
@@ -982,6 +976,9 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 		}
 		return 0;
 	}
+
+
+
 	/*** input ***/
 	
 	int outOfBounds(int x, int y){
@@ -1110,8 +1107,10 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 			break;
 			
 			case ' ':
-			if(pieceColor(game.board[game.cursorx][game.cursory]) == game.whoseTurn)
-				selectPiece();
+				if ((pieceColor((game.board[game.cursorx][game.cursory])) == game.whoseTurn) && game.selectx == -1)
+					selectPiece();
+				else
+					deselectPiece();
 			break;
 
 			case '\r':
