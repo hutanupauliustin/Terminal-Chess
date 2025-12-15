@@ -22,25 +22,25 @@
 
 /***prototypes ***/
 int outOfBounds(int x, int y);
+int isAttacked(int x, int y, int enemyColor);
 
-enum chessPieces
-{
-	WHITE_PAWN = 0,
-	WHITE_KNIGHT,
-	WHITE_BISHOP,
-	WHITE_ROOK,
-	WHITE_QUEEN,
-	WHITE_KING,
-	EMPTYSPACE,
-	CURSOR,
-	BLACK_PAWN,
-	BLACK_KNIGHT,
-	BLACK_BISHOP,
-	BLACK_ROOK,
-	BLACK_QUEEN,
-	BLACK_KING
-	
-};
+	enum chessPieces {
+		WHITE_PAWN = 0,
+		WHITE_KNIGHT,
+		WHITE_BISHOP,
+		WHITE_ROOK,
+		WHITE_QUEEN,
+		WHITE_KING,
+		EMPTYSPACE,
+		CURSOR,
+		BLACK_PAWN,
+		BLACK_KNIGHT,
+		BLACK_BISHOP,
+		BLACK_ROOK,
+		BLACK_QUEEN,
+		BLACK_KING
+
+	};
 
 enum piecesColor
 {
@@ -273,18 +273,18 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 			{
 				if (game.selecty == 0)
 				{
-					game.pieceMoveboard[game.selectx - 1][game.selecty] = pieceColor(game.board[game.selectx - 1][game.selecty]) == WHITE ? 0 : (game.board[game.selectx - 1][game.selecty] == EMPTYSPACE ? 1 : 2);
+					game.pieceMoveboard[game.selectx - 1][game.selecty] = pieceColor(game.board[game.selectx - 1][game.selecty]) == WHITE ? 0 : (game.board[game.selectx - 1][game.selecty] == EMPTYSPACE ? 1 : 0);
 					game.pieceMoveboard[game.selectx - 1][game.selecty + 1] = pieceColor(game.board[game.selectx-1][game.selecty+1]) == WHITE ? 0 :(game.board[game.selectx - 1][game.selecty + 1] == EMPTYSPACE ? 0 : 2);
 				}
 				else if (game.selecty == 7)
 				{
 					game.pieceMoveboard[game.selectx - 1][game.selecty - 1] = pieceColor(game.board[game.selectx-1][game.selecty-1]) == WHITE ? 0 :(game.board[game.selectx - 1][game.selecty - 1] == EMPTYSPACE ? 0 : 2);
-					game.pieceMoveboard[game.selectx - 1][game.selecty] = pieceColor(game.board[game.selectx - 1][game.selecty]) == WHITE ? 0 : (game.board[game.selectx - 1][game.selecty] == EMPTYSPACE ? 1 : 2);
+					game.pieceMoveboard[game.selectx - 1][game.selecty] = pieceColor(game.board[game.selectx - 1][game.selecty]) == WHITE ? 0 : (game.board[game.selectx - 1][game.selecty] == EMPTYSPACE ? 1 : 0);
 				}
 				else
 				{
 					game.pieceMoveboard[game.selectx - 1][game.selecty - 1] = pieceColor(game.board[game.selectx-1][game.selecty-1]) == WHITE ? 0 :(game.board[game.selectx - 1][game.selecty - 1] == EMPTYSPACE ? 0 : 2);
-					game.pieceMoveboard[game.selectx - 1][game.selecty] = pieceColor(game.board[game.selectx - 1][game.selecty]) == WHITE ? 0 : (game.board[game.selectx - 1][game.selecty] == EMPTYSPACE ? 1 : 2);
+					game.pieceMoveboard[game.selectx - 1][game.selecty] = pieceColor(game.board[game.selectx - 1][game.selecty]) == WHITE ? 0 : (game.board[game.selectx - 1][game.selecty] == EMPTYSPACE ? 1 : 0);
 					game.pieceMoveboard[game.selectx - 1][game.selecty + 1] = pieceColor(game.board[game.selectx-1][game.selecty+1]) == WHITE ? 0 :(game.board[game.selectx - 1][game.selecty + 1] == EMPTYSPACE ? 0 : 2);
 				}
 				break;
@@ -293,18 +293,18 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 			{
 				if (game.selecty == 0)
 				{
-					game.pieceMoveboard[game.selectx + 1][game.selecty] = pieceColor(game.board[game.selectx + 1][game.selecty]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty] == EMPTYSPACE ? 1 : 2);
+					game.pieceMoveboard[game.selectx + 1][game.selecty] = pieceColor(game.board[game.selectx + 1][game.selecty]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty] == EMPTYSPACE ? 1 : 0);
 					game.pieceMoveboard[game.selectx + 1][game.selecty + 1] = pieceColor(game.board[game.selectx + 1][game.selecty + 1]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty + 1] == EMPTYSPACE ? 0 : 2);
 				}
 				else if (game.selecty == 7)
 				{
 					game.pieceMoveboard[game.selectx + 1][game.selecty - 1] = pieceColor(game.board[game.selectx + 1][game.selecty - 1]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty - 1] == EMPTYSPACE ? 0 : 2);
-					game.pieceMoveboard[game.selectx + 1][game.selecty] = pieceColor(game.board[game.selectx + 1][game.selecty]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty] == EMPTYSPACE ? 1 : 2);
+					game.pieceMoveboard[game.selectx + 1][game.selecty] = pieceColor(game.board[game.selectx + 1][game.selecty]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty] == EMPTYSPACE ? 1 : 0);
 				}
 				else
 				{
 					game.pieceMoveboard[game.selectx + 1][game.selecty - 1] = pieceColor(game.board[game.selectx + 1][game.selecty - 1]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty - 1] == EMPTYSPACE ? 0 : 2);
-					game.pieceMoveboard[game.selectx + 1][game.selecty] = pieceColor(game.board[game.selectx + 1][game.selecty]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty] == EMPTYSPACE ? 1 : 2);
+					game.pieceMoveboard[game.selectx + 1][game.selecty] = pieceColor(game.board[game.selectx + 1][game.selecty]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty] == EMPTYSPACE ? 1 : 0);
 					game.pieceMoveboard[game.selectx + 1][game.selecty + 1] = pieceColor(game.board[game.selectx + 1][game.selecty + 1]) == BLACK ? 0 : (game.board[game.selectx + 1][game.selecty + 1] == EMPTYSPACE ? 0 : 2);
 				}
 				break;
@@ -958,16 +958,34 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 			return 1;
 	}
 
-
-	int movePiece(){
-
+int movePiece(){
+	
+	if(game.board[game.cursorx][game.cursorx] == WHITE_KING || game.board[game.cursorx][game.cursory] == BLACK_KING){
+		if (game.pieceMoveboard[game.cursorx][game.cursory] == 1 && !isAttacked(game.cursorx,game.cursory,!pieceColor(game.board[game.cursorx][game.cursory])))
+		{ // can the piece move there, and would it not be check
+			game.board[game.cursorx][game.cursory] = game.board[game.selectx][game.selecty];
+			game.board[game.selectx][game.selecty] = EMPTYSPACE;
+			deselectPiece();
+			return 1;
+		}
+		
+		if (game.pieceMoveboard[game.cursorx][game.cursory] == 2 && !isAttacked(game.cursorx, game.cursory, !pieceColor(game.board[game.cursorx][game.cursory])))
+		{ // can the piece take what's there?
+			game.board[game.cursorx][game.cursory] = game.board[game.selectx][game.selecty];
+			game.board[game.selectx][game.selecty] = EMPTYSPACE;
+			deselectPiece();
+			return 1;
+		}
+	}
+	else 
+	{
 		if(game.pieceMoveboard[game.cursorx][game.cursory] == 1){ //can the piece move there?
 			game.board[game.cursorx][game.cursory] = game.board[game.selectx][game.selecty];
 			game.board[game.selectx][game.selecty] = EMPTYSPACE;
 			deselectPiece();
 			return 1;
 		}
-
+		
 		if (game.pieceMoveboard[game.cursorx][game.cursory] == 2){ // can the piece take what's there?
 			game.board[game.cursorx][game.cursory] = game.board[game.selectx][game.selecty];
 			game.board[game.selectx][game.selecty] = EMPTYSPACE;
@@ -976,9 +994,121 @@ char *render[14] = {"\033[37m♟\033[30m", "\033[37m♞\033[30m", "\033[37m♝\0
 		}
 		return 0;
 	}
+	return 0;
+}
 
+	// Checks if square (x, y) is attacked by a sliding piece (Rook, Bishop, Queen)//made by AI :(
+	// to change into an attack map and try to implement the attack map into the pieceMoveboardmap
+	// make all squares where a king cannot move appear with a specific colour 
+	//give the move command an output when the king cannot move to somewhere because
+	//it would result un a check
+	//add a message line under the chess board
+	//maybe try to clean up the code to stop using so many global variables, "maybe"
 
+	// Returns 1 if square (x, y) is being attacked by 'enemyColor'
+	int isAttacked(int x, int y, int enemyColor)
+	{
+		// ---------------------------------------------
+		// 1. CHECK PAWNS (Missing in your code)
+		// ---------------------------------------------
+		// If the enemy is WHITE, they attack from "below" (x+1).
+		// If the enemy is BLACK, they attack from "above" (x-1).
+		int pawnDir = (enemyColor == WHITE) ? 1 : -1;
 
+		// Check diagonal left
+		if (!outOfBounds(x + pawnDir, y - 1))
+		{
+			int p = game.board[x + pawnDir][y - 1];
+			if (p != EMPTYSPACE && pieceColor(p) == enemyColor)
+			{
+				if (p == WHITE_PAWN || p == BLACK_PAWN)
+					return 1;
+			}
+		}
+		// Check diagonal right
+		if (!outOfBounds(x + pawnDir, y + 1))
+		{
+			int p = game.board[x + pawnDir][y + 1];
+			if (p != EMPTYSPACE && pieceColor(p) == enemyColor)
+			{
+				if (p == WHITE_PAWN || p == BLACK_PAWN)
+					return 1;
+			}
+		}
+
+		// ---------------------------------------------
+		// 2. CHECK KNIGHTS (Fixed variable and overwrite bugs)
+		// ---------------------------------------------
+		int kx[] = {-2, -1, 1, 2, 2, 1, -1, -2};
+		int ky[] = {1, 2, 2, 1, -1, -2, -2, -1};
+
+		for (int i = 0; i < 8; i++)
+		{
+			int tx = x + kx[i]; // Use x, not selectx
+			int ty = y + ky[i]; // Use y, not selecty
+
+			if (!outOfBounds(tx, ty))
+			{
+				int p = game.board[tx][ty];
+				if (p != EMPTYSPACE && pieceColor(p) == enemyColor)
+				{
+					if (p == WHITE_KNIGHT || p == BLACK_KNIGHT)
+						return 1; // Return immediately!
+				}
+			}
+		}
+
+		// ---------------------------------------------
+		// 3. CHECK SLIDERS (Rook, Bishop, Queen)
+		// ---------------------------------------------
+		int dx[] = {-1, 1, 0, 0, -1, -1, 1, 1};
+		int dy[] = {0, 0, -1, 1, -1, 1, -1, 1};
+
+		for (int dir = 0; dir < 8; dir++)
+		{
+			for (int dist = 1; dist < 8; dist++)
+			{
+				int tx = x + (dx[dir] * dist);
+				int ty = y + (dy[dir] * dist);
+
+				if (outOfBounds(tx, ty))
+					break;
+
+				int piece = game.board[tx][ty];
+
+				if (piece != EMPTYSPACE)
+				{
+					if (pieceColor(piece) == enemyColor)
+					{
+						int isRook = (piece == WHITE_ROOK || piece == BLACK_ROOK);
+						int isBishop = (piece == WHITE_BISHOP || piece == BLACK_BISHOP);
+						int isQueen = (piece == WHITE_QUEEN || piece == BLACK_QUEEN);
+						int isKing = (piece == WHITE_KING || piece == BLACK_KING);
+
+						// Orthogonal (0-3): Rook, Queen, or King (1 step)
+						if (dir < 4)
+						{
+							if (isRook || isQueen)
+								return 1;
+							if (isKing && dist == 1)
+								return 1;
+						}
+						// Diagonal (4-7): Bishop, Queen, or King (1 step)
+						else
+						{
+							if (isBishop || isQueen)
+								return 1;
+							if (isKing && dist == 1)
+								return 1;
+						}
+					}
+					break; // Blocked by ANY piece
+				}
+			}
+		}
+
+		return 0; // Safe
+	}
 	/*** input ***/
 	
 	int outOfBounds(int x, int y){
