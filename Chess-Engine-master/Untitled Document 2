@@ -1,0 +1,15 @@
+attackMap --- a bitboard showring where each piece can potentially attack
+moveMap   --- a bitboard showing where each piece can potentially move
+
+
+when selecting a piece, if it is a slidding piece (R,B,Q) it's attackMap and moveMap will be generated on the spot, while the rest of the pieces have their attackMap and moveMap pregenerated to save computation speed.
+
+when the search is generating moves it will create each possible move for each possible piece on the board, by "making" said move on a new bitboard, there should never be more than 16 of these new boards. it will then calculate the value of these moves and move the most favorable. Moves will be interpreted as a sepparate struct with the intial position and the final position, it will output information about the moves( is it a capture, is it a castle, etc.)
+
+when making a move, when selecting a piece, each point that corresponds with the moveMap( & bit operation ) with be treated as a potential move, and each point that corresponds with the attackMap with be treated as a potential capture  
+
+
+
+change the drawMap function to a processMap function isntead that creates a 8x8 double array that stores at each point the piece in that square, the colour, if it is a valid move, and what kind of move it is;
+
+then create a new drawMap function that draws the array made by the processMap function

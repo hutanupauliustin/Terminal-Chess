@@ -1,0 +1,116 @@
+This is a challenging but rewarding path. Writing a C engine with bitboards is "hard mode" at first, but it gives you the highest performance ceiling.
+
+Here is your step-by-step guide to building the engine, specifically focusing on the critical architectural choices you will face at each stage.
+Phase 1: The Data Structures (The "State")
+
+You need to represent the board. In a bitboard engine, the state is compact.
+
+Step 1: Define the Bitboards You need 12 uint64_t variables (one for each piece type and color) and 3 occupancy boards (all white, all black, all both).
+
+    The Choice: Global Arrays vs. Position Struct.
+
+        Option A (Global Arrays): Easier to type bitboards[WHITE_PAWN].
+
+        Option B (Struct): pos->bitboards[WHITE_PAWN].
+
+        Recommendation: Use a Struct (typedef struct { U64 bitboards[12]; ... } Position;). This allows you to have multiple boards in memory (useful for multithreading later) and keeps your code clean.
+
+Step 2: Define the "GameState" Metadata A board is more than just pieces. You must track:
+
+    Side to move: (0 for White, 1 for Black).
+
+    Castling Rights: An integer (or 4 bits) representing standard castling availability.
+
+    En Passant Square: The square index where a pawn can be captured en passant (or -1 / no_sq if none).
+
+    Halfmove Clock: For the 50-move rule.
+
+Phase 2: The Attack Tables (The "Physics")
+
+This is where you choose how your universe works. You don't calculate "can a knight jump here?" during the game. You calculate it once at startup.
+
+Step 3: Leaper Pieces (Knights & Kings)
+
+    The Logic: Since knights/kings always jump to fixed relative squares, you pre-calculate an array U64 knight_attacks[64].
+
+    The Choice: Hardcode arrays vs. Startup calculation.
+
+        Recommendation: Write a function init_leapers() that runs when your program starts. It loops 64 squares and fills the array. It keeps your source code smaller and cleaner than pasting 64 massive hex numbers.
+
+Step 4: Sliding Pieces (Rooks & Bishops) This is the hardest part of a bitboard engine. Sliders get blocked by pieces.
+
+    The Choice: Classical Loops vs. Magic Bitboards.
+
+        Option A (Classical): Loop outward from the square until you hit a blocker. Pros: Easy to write. Cons: Slow (requires memory access and branching inside the loop).
+
+        Option B (Magic Bitboards): The industry standard. You use a "magic number" to hash the current blockers into an index, then look up the answer in a massive pre-computed table. Pros: Instant answer. Cons: Very complex to implement initially.
+
+        Recommendation: Start with Option A (Classical Loops). Get your engine working. It will still be faster than you can play. Upgrade to Magic Bitboards in Version 2.0.
+
+Phase 3: Move Generation (The Logic)
+
+Step 5: Pseudo-Legal Move Generation You generate moves without checking if the King is left in check (it's faster).
+
+    The Loop: You don't loop 64 squares. You loop the bitboard.
+
+        Use a function like bit_scan_forward (assembly instruction bsf) to find the index of the first piece.
+
+        Process that piece.
+
+        Use pop_bit to remove it.
+
+        Repeat until the bitboard is empty.
+
+    The Choice: Move List vs. Stacks.
+
+        Recommendation: Create a MoveList struct containing an array of moves and a count. A fixed array of 256 moves is safe (no position has more legal moves than that).
+
+Step 6: Make/Unmake Move This is the heart of the engine.
+
+    The Choice: Copy-Make vs. Make-Unmake.
+
+        Option A (Copy): Copy the whole board struct, apply the move, and pass the copy to the next function. Pros: No "unmake" logic needed. Cons: Slow (copying 200+ bytes is expensive).
+
+        Option B (Make/Unmake): Modify the board, recurse, then strictly reverse the modification.
+
+        Recommendation: Make/Unmake. It is significantly faster. You must implement an UnmakeMove() function that puts the captured piece back and restores castling rights (use a history array to remember previous castling rights).
+
+Phase 4: Search & Evaluation (The Brain)
+
+Step 7: Evaluation Function
+
+    The Choice: Complexity vs. Performance.
+
+        Recommendation: Keep it simple.
+
+        Score = Material + PieceSquareTables.
+
+        Define arrays like PawnTable[64] where central squares have higher values.
+
+        TotalScore = WhiteScore - BlackScore.
+
+Step 8: Alpha-Beta Search
+
+    Implement a standard Minimax with Alpha-Beta pruning.
+
+    Crucial: Add "Quiescence Search" (Q-Search) at the end. This is a special search that only looks at captures. Without it, your engine will blunder pieces because it stops searching in the middle of a trade (the "Horizon Effect").
+
+Phase 5: The Interface (UCI)
+
+Step 9: The Loop
+
+    Your main() function is just a while(1) loop waiting for text input.
+
+    Parse position startpos moves e2e4...: Update your internal board.
+
+    Parse go wtime 60000: Call your search function.
+
+Summary of the "Hard" Choices
+
+    Board: Use a struct (not global arrays).
+
+    Sliders: Start with Classical loops (upgrade to Magic later).
+
+    State Update: Use Make/Unmake (not Copy).
+
+    Search: You must have Quiescence Search (or it will play like a beginner).
